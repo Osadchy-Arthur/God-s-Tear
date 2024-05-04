@@ -17,7 +17,6 @@ public class Hero : MonoBehaviour
 
 
     private Rigidbody2D rb;
-    private SpriteRenderer sprite;
 
     public bool hold;
     public float distance = 5f;
