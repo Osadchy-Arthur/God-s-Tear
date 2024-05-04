@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class potionHold : MonoBehaviour
 {
-    public bool hold;
+
     public float distance = 5f;
     RaycastHit2D hit;
     public Transform holdPoint;
     public float throwObject = 5;
 
-    // Направление, в котором находится персонаж
-    private int playerDirection = 1; // По умолчанию направление вправо
+    // ГЌГ ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ, Гў ГЄГ®ГІГ®Г°Г®Г¬ Г­Г ГµГ®Г¤ГЁГІГ±Гї ГЇГҐГ°Г±Г®Г­Г Г¦
+    private int playerDirection = 1; // ГЏГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГўГЇГ°Г ГўГ®
 
     // Update is called once per frame
     void Update()
@@ -20,7 +20,7 @@ public class potionHold : MonoBehaviour
 
         if (horizontalInput != 0)
         {
-            // Определяем направление персонажа
+            // ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГЇГҐГ°Г±Г®Г­Г Г¦Г 
             playerDirection = (int)Mathf.Sign(horizontalInput);
         }
 
@@ -42,7 +42,7 @@ public class potionHold : MonoBehaviour
 
                 if (hit.collider != null && hit.collider.gameObject.GetComponent<Rigidbody2D>() != null)
                 {
-                    // Используем сохраненное направление персонажа для броска зелья
+                    // Г€Г±ГЇГ®Г«ГјГ§ГіГҐГ¬ Г±Г®ГµГ°Г Г­ГҐГ­Г­Г®ГҐ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГҐ ГЇГҐГ°Г±Г®Г­Г Г¦Г  Г¤Г«Гї ГЎГ°Г®Г±ГЄГ  Г§ГҐГ«ГјГї
                     hit.collider.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(playerDirection, 1) * throwObject;
                 }
             }
@@ -50,24 +50,24 @@ public class potionHold : MonoBehaviour
 
         if (hold)
         {
-            // Устанавливаем позицию зелья на точке держания
+            // Г“Г±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГ¬ ГЇГ®Г§ГЁГ¶ГЁГѕ Г§ГҐГ«ГјГї Г­Г  ГІГ®Г·ГЄГҐ Г¤ГҐГ°Г¦Г Г­ГЁГї
             hit.collider.gameObject.transform.position = holdPoint.position;
 
-            // Поворачиваем зелье в зависимости от направления персонажа
+            // ГЏГ®ГўГ®Г°Г Г·ГЁГўГ ГҐГ¬ Г§ГҐГ«ГјГҐ Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ Г­Г ГЇГ°Г ГўГ«ГҐГ­ГЁГї ГЇГҐГ°Г±Г®Г­Г Г¦Г 
             if (playerDirection > 0)
             {
                 hit.collider.gameObject.transform.localScale = new Vector2(Mathf.Abs(hit.collider.gameObject.transform.localScale.x), Mathf.Abs(hit.collider.gameObject.transform.localScale.y));
-                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 0, -22); // Поворачиваем обратно по оси Y
+                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 0, -22); // ГЏГ®ГўГ®Г°Г Г·ГЁГўГ ГҐГ¬ Г®ГЎГ°Г ГІГ­Г® ГЇГ® Г®Г±ГЁ Y
             }
             else
             {
-                // Если персонаж повернут влево, поворачиваем зелье на 180 градусов по оси Y
+                // Г…Г±Г«ГЁ ГЇГҐГ°Г±Г®Г­Г Г¦ ГЇГ®ГўГҐГ°Г­ГіГІ ГўГ«ГҐГўГ®, ГЇГ®ГўГ®Г°Г Г·ГЁГўГ ГҐГ¬ Г§ГҐГ«ГјГҐ Г­Г  180 ГЈГ°Г Г¤ГіГ±Г®Гў ГЇГ® Г®Г±ГЁ Y
                 hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 180, -22);
             }
         }
 
 
-        // Позиция точки, где будет держаться зелье
+        // ГЏГ®Г§ГЁГ¶ГЁГї ГІГ®Г·ГЄГЁ, ГЈГ¤ГҐ ГЎГіГ¤ГҐГІ Г¤ГҐГ°Г¦Г ГІГјГ±Гї Г§ГҐГ«ГјГҐ
         holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
     }
 
