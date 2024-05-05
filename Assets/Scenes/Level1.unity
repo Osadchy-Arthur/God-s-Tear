@@ -3451,6 +3451,7 @@ GameObject:
   - component: {fileID: 1527129096}
   - component: {fileID: 1527129095}
   - component: {fileID: 1527129097}
+  - component: {fileID: 1527129098}
   - component: {fileID: 1527129099}
   m_Layer: 7
   m_Name: Hero
@@ -3549,6 +3550,26 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &1527129098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1527129094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 225812b3260636449bc5d0cd6e333207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 1
+  lives: 100
+  attackDamage: 40
+  attackRate: 1
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  attackPoint: {fileID: 1798546401}
 --- !u!114 &1527129099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3699,7 +3720,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 1527129098}
           m_TargetAssemblyTypeName: Hero, Assembly-CSharp
           m_MethodName: Attack
           m_Mode: 1
@@ -4126,7 +4147,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1527129098}
         m_TargetAssemblyTypeName: Hero, Assembly-CSharp
         m_MethodName: HoldThrowPotion
         m_Mode: 1
