@@ -95,7 +95,7 @@ public class Hero : MonoBehaviour
             hit.collider.gameObject.transform.position = holdPoint.position;
         }
     }
-
+*/
 /*
     private void Run()
     {
