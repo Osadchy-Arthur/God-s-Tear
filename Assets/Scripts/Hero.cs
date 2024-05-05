@@ -5,6 +5,47 @@ using UnityEngine.SceneManagement;
 
 public class Hero : MonoBehaviour
 {
+    [SerializeField] private float attackRange = 0.5f;
+    [SerializeField] private int lives = 100;
+    public int attackDamage = 40;
+    public float attackRate = 0.5f;
+    private float nextAttackTime = 0f;
+    public LayerMask enemyLayers;
+    public Transform attackPoint;
+
+    private Rigidbody2D rb;
+
+    private void Attack()
+    {
+        if (Time.time < nextAttackTime)
+        {
+            return;
+        }
+        nextAttackTime = Time.time + 1f / attackRate;
+
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        foreach (Collider2D enemy in enemies)
+        {
+            enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
+        }
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        lives -= damageAmount;
+        if (lives < 0)
+        Debug.Log("PLayer has taken " + damageAmount);
+        {
+             Debug.Log("Player has taken too much damage and DIE");
+        }
+    }
+}
+
+
+
+
+/*
     [SerializeField] private float speed = 3f;
     [SerializeField] private int lives = 5;
     [SerializeField] private float jumpForce = 15f;
@@ -16,7 +57,7 @@ public class Hero : MonoBehaviour
     public Transform attackPoint;
     private bool isGrounded = false;
     public Joystick joystick;
-
+ 
 
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
@@ -97,7 +138,7 @@ public class Hero : MonoBehaviour
         holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
         
     }
-*/
+
 
     private void Run()
     {
@@ -226,4 +267,4 @@ public class Hero : MonoBehaviour
         AudioManager.instance.Play("Death");
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-}
+*/
