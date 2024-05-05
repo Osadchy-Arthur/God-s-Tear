@@ -138,8 +138,8 @@ public class Hero : MonoBehaviour
         holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
         
     }
-
-
+*/
+/*
     private void Run()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
