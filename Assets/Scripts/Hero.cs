@@ -98,7 +98,7 @@ public class Hero : MonoBehaviour
         
     }
 */
-
+/*
     private void Run()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -227,3 +227,4 @@ public class Hero : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
+*/
