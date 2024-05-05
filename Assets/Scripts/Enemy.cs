@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Enemy : MonoBehaviour
 {
@@ -21,8 +22,9 @@ public class Enemy : MonoBehaviour
     public float attackRange = 0.5f; 
 
     public int damage = 10; 
-    public float attackRate = 2f;
+    public float attackRate = 0.5f;
     private float nextAttackTime = 0f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -139,6 +141,7 @@ public class Enemy : MonoBehaviour
         // disable the enemy
         gameObject.SetActive(false);
         GetComponent<Collider2D>().enabled = false;
-        this.enabled = false;
+        AudioManager.instance.Play("Victory");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

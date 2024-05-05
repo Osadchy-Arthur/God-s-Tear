@@ -1,6 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Hero : MonoBehaviour
 {
@@ -9,17 +10,18 @@ public class Hero : MonoBehaviour
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private float attackRange = 0.5f;
     public int attackDamage = 40;
-    public float attackRate = 2f;
+    public float attackRate = 0.5f;
     private float nextAttackTime = 0f;
     public LayerMask enemyLayers;
     public Transform attackPoint;
     private bool isGrounded = false;
+    public Joystick joystick;
 
 
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
 
-    public bool hold;
+    private bool hold;
     public float distance = 5f;
     RaycastHit2D hit;
     public Transform holdPoint;
@@ -27,7 +29,6 @@ public class Hero : MonoBehaviour
 
     // Направление, в котором находится персонаж
     private int playerDirection = 1; // По умолчанию направление вправо
-
 
     private void Awake()
     {
@@ -42,23 +43,10 @@ public class Hero : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("Horizontal"))
+        if (joystick.Horizontal != 0)
             Run();
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        if (isGrounded && joystick.Vertical > 0.5f)
             Jump();
-        if (Time.time >= nextAttackTime)
-        {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                Attack();
-                nextAttackTime = Time.time + 1f / attackRate;
-            }
-
-        }
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            HoldThrowPotion();
-        }
 
         if (hold)
         {
@@ -67,7 +55,126 @@ public class Hero : MonoBehaviour
         }
     }
 
-    private void HoldThrowPotion()
+/*
+    private void Run()
+    {
+    
+        float horizontalInput = Input.GetAxis("Horizontal");
+        Vector3 dir = transform.right * joystick.Horizontal;
+
+        // 
+        transform.position = Vector3.MoveTowards(transform.position, transform.position + dir, speed * Time.deltaTime);
+
+        // 
+        float attackPointOffset = Mathf.Sign(horizontalInput) * attackRange;
+        attackPoint.position = transform.position + new Vector3(attackPointOffset, 1f, 0f);
+
+        // 
+        sprite.flipX = horizontalInput < 0.0f;
+
+        if (horizontalInput != 0)
+        {
+            // Определяем направление персонажа
+            playerDirection = (int)Mathf.Sign(horizontalInput);
+        }
+
+        if (hold)
+        {
+            // Поворачиваем зелье в зависимости от направления персонажа
+            if (playerDirection > 0)
+            {
+                hit.collider.gameObject.transform.localScale = new Vector2(Mathf.Abs(hit.collider.gameObject.transform.localScale.x), Mathf.Abs(hit.collider.gameObject.transform.localScale.y));
+                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 0, -22); // Поворачиваем обратно по оси Y
+            }
+            else
+            {
+                // Если персонаж повернут влево, поворачиваем зелье на 180 градусов по оси Y
+                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 180, -22);
+            }
+        }
+
+        // Позиция точки, где будет держаться зелье
+        holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
+        
+    }
+*/
+
+    private void Run()
+    {
+        float horizontalInput = Input.GetAxis("Horizontal");
+        Vector3 dir = transform.right * joystick.Horizontal;
+
+        // Move the character
+        transform.position = Vector3.MoveTowards(transform.position, transform.position + dir, speed * Time.deltaTime);
+
+        // Update attack point position
+        float attackPointOffset = Mathf.Sign(joystick.Horizontal) * attackRange;
+        attackPoint.position = transform.position + new Vector3(attackPointOffset, 1f, 0f);
+
+        // Update holding point position
+        holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
+
+        // Flip character sprite based on input
+        sprite.flipX = horizontalInput < 0.0f;
+
+        if (horizontalInput != 0)
+        {
+            // Update the player's direction
+            playerDirection = (int)Mathf.Sign(horizontalInput);
+        }
+
+        if (hold)
+        {
+            // Rotate the held object based on the player's direction
+            hit.collider.gameObject.transform.localScale = new Vector2(playerDirection * Mathf.Abs(hit.collider.gameObject.transform.localScale.x), Mathf.Abs(hit.collider.gameObject.transform.localScale.y));
+            hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 0, playerDirection > 0 ? -22 : 158); // Rotate based on player's direction
+        }
+    }
+
+    private void Jump()
+    {
+        rb.velocity = Vector2.up * jumpForce;
+    }
+
+    private void CheckGround()
+    {
+        Collider2D[] collider = Physics2D.OverlapCircleAll(transform.position, 0.3f);
+        isGrounded = collider.Length > 1;
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        lives -= damageAmount;
+        Debug.Log("Player has taken " + damageAmount + " damage. Lives remaining: " + lives);
+        AudioManager.instance.Play("Damage");
+        if (lives <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void Attack()
+    {
+        if (Time.time < nextAttackTime)
+            return;
+        nextAttackTime = Time.time + 1f / attackRate;
+        // play animation
+        // animator.SetTrigger("Attack");
+
+        //detect enemies in range of attack
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        //damage then
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
+        }
+
+        AudioManager.instance.Play("Attack");
+    }
+
+
+    public void HoldThrowPotion()
     {
 
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -98,88 +205,9 @@ public class Hero : MonoBehaviour
                 hit.collider.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(playerDirection, 1) * throwObject;
             }
         }
-
-
-        
-
     }
 
-    private void Run()
-    {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        Vector3 dir = transform.right * horizontalInput;
 
-        // Перемещаем игрока
-        transform.position = Vector3.MoveTowards(transform.position, transform.position + dir, speed * Time.deltaTime);
-
-        // Устанавливаем позицию attackPoint с учетом направления движения игрока
-        float attackPointOffset = Mathf.Sign(horizontalInput) * attackRange;
-        attackPoint.position = transform.position + new Vector3(attackPointOffset, 1f, 0f);
-
-        // Поворачиваем спрайт игрока и attackPoint в зависимости от направления движения
-        sprite.flipX = horizontalInput < 0.0f;
-
-        if (horizontalInput != 0)
-        {
-            // Определяем направление персонажа
-            playerDirection = (int)Mathf.Sign(horizontalInput);
-        }
-
-        if (hold)
-        {
-            // Поворачиваем зелье в зависимости от направления персонажа
-            if (playerDirection > 0)
-            {
-                hit.collider.gameObject.transform.localScale = new Vector2(Mathf.Abs(hit.collider.gameObject.transform.localScale.x), Mathf.Abs(hit.collider.gameObject.transform.localScale.y));
-                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 0, -22); // Поворачиваем обратно по оси Y
-            }
-            else
-            {
-                // Если персонаж повернут влево, поворачиваем зелье на 180 градусов по оси Y
-                hit.collider.gameObject.transform.rotation = Quaternion.Euler(0, 180, -22);
-            }
-        }
-
-
-        // Позиция точки, где будет держаться зелье
-        holdPoint.position = transform.position + new Vector3(playerDirection, 1f, 0f);
-    }
-
-    private void Jump()
-    {
-        rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);
-    }
-
-    private void CheckGround()
-    {
-        Collider2D[] collider = Physics2D.OverlapCircleAll(transform.position, 0.3f);
-        isGrounded = collider.Length > 1;
-    }
-
-    public void TakeDamage(int damageAmount)
-    {
-        lives -= damageAmount;
-        Debug.Log("Player has taken " + damageAmount + " damage. Lives remaining: " + lives);
-        if (lives <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Attack()
-    {
-        // play animation
-        // animator.SetTrigger("Attack");
-
-        //detect enemies in range of attack
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
-
-        //damage then
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
-        }
-    }
 
     // risuem radius ataki dla ydobstva
     private void OnDrawGizmosSelected()
@@ -195,7 +223,7 @@ public class Hero : MonoBehaviour
         
         Debug.Log("Player has died!");
         this.enabled = false;
-        
+        AudioManager.instance.Play("Death");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
 }

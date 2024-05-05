@@ -14,7 +14,7 @@ public class potionHold : MonoBehaviour
     private int playerDirection = 1; // По умолчанию направление вправо
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
 
